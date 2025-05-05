@@ -1,0 +1,2 @@
+E:/projects/mindcare/android/app/.cxx/Debug/k5o3p723/armeabi-v7a/CMakeFiles/edit_cache.dir
+E:/projects/mindcare/android/app/.cxx/Debug/k5o3p723/armeabi-v7a/CMakeFiles/rebuild_cache.dir

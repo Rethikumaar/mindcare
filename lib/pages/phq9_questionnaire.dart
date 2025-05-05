@@ -1,3 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -11,6 +14,7 @@ class PHQ9Questionnaire extends StatefulWidget {
 }
 
 class _PHQ9QuestionnaireState extends State<PHQ9Questionnaire> {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
   final List<String> _questions = [
     'Little interest or pleasure in doing things?',
     'Feeling down, depressed, or hopeless?',
@@ -33,7 +37,7 @@ class _PHQ9QuestionnaireState extends State<PHQ9Questionnaire> {
   int _currentIndex = 0;
   List<int?> _responses = List.filled(9, null);
   bool _isLoading = false;
-  String? _userId;
+  String? _userId = "rethi"; // Hardcoded for now; should be updated with Firebase logic.
 
   @override
   void initState() {
@@ -42,15 +46,19 @@ class _PHQ9QuestionnaireState extends State<PHQ9Questionnaire> {
   }
 
   Future<void> _getUserId() async {
-    final prefs = await SharedPreferences.getInstance();
-    String? userId = prefs.getString('userId');
-    if (userId == null) {
-      userId = Uuid().v4();
-      await prefs.setString('userId', userId);
+    var user = _auth.currentUser;
+    if (user != null) {
+      try {
+        var docSnapshot = await FirebaseFirestore.instance.collection("users").doc(user.uid).get();
+        var username = docSnapshot.data()?['username'] as String?;
+        setState(() {
+          _userId = username;
+        });
+        print(_userId);
+      } catch (e) {
+        print('Error retrieving user data: $e');
+      }
     }
-    setState(() {
-      _userId = userId;
-    });
   }
 
   void _selectAnswer(int value) {
@@ -100,33 +108,64 @@ class _PHQ9QuestionnaireState extends State<PHQ9Questionnaire> {
         submitUrl,
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
-          'user_id': _userId,
+          'user': _userId,
           'responses': _responses,
         }),
       );
 
-      if (submitRes.statusCode != 200) {
-        throw Exception("Submission failed: ${submitRes.body}");
-      }
+      // if (submitRes.statusCode != 200) {
+      //   throw Exception('Submission failed: ${submitRes.body}');
+      // }
 
       final resultRes = await http.get(
         Uri.parse('${resultUrl.toString()}?user_id=$_userId'),
       );
 
+      // Print the raw response for debugging
+      print('Result Response Body: ${resultRes.body}');
+
       if (resultRes.statusCode != 200) {
         throw Exception("Could not fetch results.");
       }
 
-      final result = jsonDecode(resultRes.body);
+      final resultList = jsonDecode(resultRes.body); // List of results
+      print('Decoded Result List: $resultList');
 
-      int score = result['total_score'] ?? 0;
-      String assessment = result['assessment'] ?? 'Unknown';
-      int testCount = result['test_count'] ?? 1;
+      // Access the first item in the result list (assuming you're interested in the first entry)
+      if (resultList.isEmpty) {
+        throw Exception("No results found.");
+      }
 
-      await _saveHistory(score, assessment);
+      final result = resultList[0]; // Take the first item in the list
 
-      _navigateToResultPage(score, assessment, testCount);
-    } catch (e) {
+      // Debug the first result object
+      print('First Result: $result');
+
+      try {
+        int score = 0;
+        String? scoreString = result['responses']?.toString();  // You might want to use the 'responses' array or change this as per your API response
+        if (scoreString != null) {
+          score = int.tryParse(scoreString) ?? 0;
+        }
+
+        String assessment = result['prediction'] ?? 'Unknown'; // Based on the response, 'prediction' seems to be the assessment
+        int testCount = 1; // You can update this if there is a 'test_count' field available in the response
+
+        print('Parsed Score: $score');
+        print('Assessment: $assessment');
+        print('Test Count: $testCount');
+
+        await _saveHistory(score, assessment);
+
+        _navigateToResultPage(score, assessment, testCount);
+      } catch (e) {
+        print('Error while parsing result data: $e');
+        _showSnackBar('Error parsing the result data.');
+      }
+    } catch (e, stackTrace) {
+      // Log the error and stack trace for more insight into where the failure is happening
+      print('Error: ${e.toString()}');
+      print('Stack Trace: $stackTrace');
       _showSnackBar('Error: ${e.toString()}');
     } finally {
       setState(() {
@@ -134,6 +173,7 @@ class _PHQ9QuestionnaireState extends State<PHQ9Questionnaire> {
       });
     }
   }
+
 
   Future<void> _saveHistory(int score, String assessment) async {
     final prefs = await SharedPreferences.getInstance();
