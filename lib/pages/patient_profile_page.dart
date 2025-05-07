@@ -6,7 +6,7 @@ import 'package:intl/intl.dart';
 class PatientDashboard extends StatefulWidget {
   final String userId;
 
-  const PatientDashboard({Key? key, required this.userId}) : super(key: key);
+  const PatientDashboard({super.key, required this.userId});
 
   @override
   _PatientDashboardState createState() => _PatientDashboardState();
@@ -34,19 +34,6 @@ class _PatientDashboardState extends State<PatientDashboard> {
     "Dr. Kartik"
   ];
 
-  final List<Map<String, String>> poses = [
-    {
-      'name': 'Child\'s Pose',
-      'image': 'assets/images/child_pose.png',
-      'description': 'A resting pose that calms the mind and relieves tension.'
-    },
-    {
-      'name': 'Downward Dog',
-      'image': 'assets/images/downward_dog.png',
-      'description': 'An energizing pose that stretches the entire body.'
-    },
-  ];
-
   final List<String> dailyInspirations = [
     "Take a deep breath and let go of stress.",
     "Peace begins with a smile.",
@@ -71,137 +58,112 @@ class _PatientDashboardState extends State<PatientDashboard> {
     showDialog(
       context: context,
       builder: (context) {
-        String? selectedTime = _selectedTime;
-        String? selectedDoctor = _selectedDoctor;
-
-        return AlertDialog(
-          title: Text("Schedule Appointment"),
-          content: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text("Select Date", style: TextStyle(fontWeight: FontWeight.bold)),
-                SizedBox(height: 5),
-                InkWell(
-                  onTap: () => _selectDate(context),
-                  child: Container(
-                    width: double.infinity,
-                    padding: EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.black),
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                    child: Text(
-                      _selectedDate == null
-                          ? "Choose a date"
-                          : DateFormat('MMMM dd, yyyy').format(_selectedDate!),
-                      style: TextStyle(fontSize: 16),
+        return StatefulBuilder(
+          builder: (context, setStateDialog) => AlertDialog(
+            title: const Text("Schedule Appointment"),
+            content: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text("Select Date", style: TextStyle(fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 5),
+                  InkWell(
+                    onTap: () => _selectDate(context),
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.black),
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                      child: Text(
+                        _selectedDate == null
+                            ? "Choose a date"
+                            : DateFormat('MMMM dd, yyyy').format(_selectedDate!),
+                        style: const TextStyle(fontSize: 16),
+                      ),
                     ),
                   ),
-                ),
-                SizedBox(height: 15),
-                Text("Select Time", style: TextStyle(fontWeight: FontWeight.bold)),
-                DropdownButton<String>(
-                  isExpanded: true,
-                  hint: Text("Select Time"),
-                  value: selectedTime,
-                  onChanged: (value) {
-                    setState(() => _selectedTime = value);
-                  },
-                  items: _timeSlots.map((time) {
-                    return DropdownMenuItem<String>(
-                      value: time,
-                      child: Text(time),
-                    );
-                  }).toList(),
-                ),
-                SizedBox(height: 15),
-                Text("Select Doctor", style: TextStyle(fontWeight: FontWeight.bold)),
-                DropdownButton<String>(
-                  isExpanded: true,
-                  hint: Text("Select Doctor"),
-                  value: selectedDoctor,
-                  onChanged: (value) {
-                    setState(() => _selectedDoctor = value);
-                  },
-                  items: _doctorList.map((doctor) {
-                    return DropdownMenuItem<String>(
-                      value: doctor,
-                      child: Text(doctor),
-                    );
-                  }).toList(),
-                ),
-              ],
+                  const SizedBox(height: 15),
+                  const Text("Select Time", style: TextStyle(fontWeight: FontWeight.bold)),
+                  DropdownButton<String>(
+                    isExpanded: true,
+                    hint: const Text("Select Time"),
+                    value: _selectedTime,
+                    onChanged: (value) {
+                      setStateDialog(() => _selectedTime = value);
+                    },
+                    items: _timeSlots.map((time) {
+                      return DropdownMenuItem<String>(
+                        value: time,
+                        child: Text(time),
+                      );
+                    }).toList(),
+                  ),
+                  const SizedBox(height: 15),
+                  const Text("Select Doctor", style: TextStyle(fontWeight: FontWeight.bold)),
+                  DropdownButton<String>(
+                    isExpanded: true,
+                    hint: const Text("Select Doctor"),
+                    value: _selectedDoctor,
+                    onChanged: (value) {
+                      setStateDialog(() => _selectedDoctor = value);
+                    },
+                    items: _doctorList.map((doctor) {
+                      return DropdownMenuItem<String>(
+                        value: doctor,
+                        child: Text(doctor),
+                      );
+                    }).toList(),
+                  ),
+                ],
+              ),
             ),
+            actions: [
+              TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel")),
+              ElevatedButton(
+                onPressed: () async {
+                  final user = FirebaseAuth.instance.currentUser;
+                  if (_selectedDate != null && _selectedTime != null && _selectedDoctor != null) {
+                    await FirebaseFirestore.instance.collection('appointments').add({
+                      'userId': widget.userId,
+                      'userName': user?.displayName ?? 'Patient',
+                      'date': _selectedDate,
+                      'time': _selectedTime,
+                      'doctor': _selectedDoctor,
+                      'status': 'Scheduled',
+                      'createdAt': FieldValue.serverTimestamp(),
+                    });
+                    Navigator.pop(context);
+                  }
+                },
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.black),
+                child: const Text("Save Appointment"),
+              ),
+            ],
           ),
-          actions: [
-            TextButton(onPressed: () => Navigator.pop(context), child: Text("Cancel")),
-            ElevatedButton(
-              onPressed: () async {
-                final user = FirebaseAuth.instance.currentUser;
-                if (_selectedDate != null && _selectedTime != null && _selectedDoctor != null) {
-                  await FirebaseFirestore.instance.collection('appointments').add({
-                    'userId': widget.userId,
-                    'userName': user?.displayName ?? 'Patient',
-                    'date': _selectedDate,
-                    'time': _selectedTime,
-                    'doctor': _selectedDoctor,
-                    'status': 'Scheduled',
-                    'createdAt': FieldValue.serverTimestamp(),
-                  });
-                  Navigator.pop(context);
-                }
-              },
-              child: Text("Save Appointment"),
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.black),
-            ),
-          ],
         );
       },
     );
   }
 
-  Widget _buildFeaturedPoses() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text("Featured Poses", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-        SizedBox(height: 10),
-        SizedBox(
-          height: 150,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: poses.length,
-            itemBuilder: (context, index) {
-              final pose = poses[index];
-              return Container(
-                width: 140,
-                margin: EdgeInsets.only(right: 10),
-                child: Column(
-                  children: [
-                    Image.asset(pose['image']!, height: 80),
-                    SizedBox(height: 5),
-                    Text(pose['name']!, style: TextStyle(fontWeight: FontWeight.bold)),
-                    Text(pose['description']!, style: TextStyle(fontSize: 12), textAlign: TextAlign.center),
-                  ],
-                ),
-              );
-            },
-          ),
-        ),
-      ],
-    );
-  }
-
   Widget _buildDailyInspiration() {
     final index = DateTime.now().day % dailyInspirations.length;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text("Daily Inspiration", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-        SizedBox(height: 5),
-        Text(dailyInspirations[index], style: TextStyle(fontSize: 14, fontStyle: FontStyle.italic)),
-      ],
+    return Card(
+      color: Colors.deepPurple.shade50,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      margin: const EdgeInsets.symmetric(vertical: 10),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text("Daily Inspiration", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 5),
+            Text(dailyInspirations[index], style: const TextStyle(fontSize: 14, fontStyle: FontStyle.italic)),
+          ],
+        ),
+      ),
     );
   }
 
@@ -211,32 +173,33 @@ class _PatientDashboardState extends State<PatientDashboard> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("Patient Profile"),
-        backgroundColor: Colors.black,
+        title: const Text("Patient Dashboard"),
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black,
+        elevation: 0,
         actions: [
           IconButton(
-            icon: Icon(Icons.logout),
+            icon: const Icon(Icons.logout),
             onPressed: () => FirebaseAuth.instance.signOut(),
           )
         ],
       ),
       body: Padding(
-        padding: EdgeInsets.all(20),
+        padding: const EdgeInsets.all(20),
         child: ListView(
           children: [
-            Text("Welcome, ${user?.displayName ?? 'Patient'}", style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold)),
-            SizedBox(height: 30),
-            ElevatedButton(
+            Text("Welcome, ${user?.displayName ?? 'Patient'}", style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 30),
+            ElevatedButton.icon(
               onPressed: _scheduleAppointment,
+              icon: const Icon(Icons.schedule),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.black,
-                padding: EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+                backgroundColor: Colors.deepPurple,
+                padding: const EdgeInsets.symmetric(vertical: 14),
               ),
-              child: Text("Schedule Appointment", style: TextStyle(fontSize: 16)),
+              label: const Text("Schedule Appointment", style: TextStyle(fontSize: 16)),
             ),
-            SizedBox(height: 30),
-            _buildFeaturedPoses(),
-            SizedBox(height: 30),
+            const SizedBox(height: 30),
             _buildDailyInspiration(),
           ],
         ),

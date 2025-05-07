@@ -5,7 +5,7 @@ import 'package:mindcare/pages/pricing.dart';
 import 'package:mindcare/pages/testimonial.dart';
 
 class MainScreen extends StatefulWidget {
-  const MainScreen({Key? key}) : super(key: key);
+  const MainScreen({super.key});
 
   @override
   State<MainScreen> createState() => _MainScreenState();
@@ -15,10 +15,10 @@ class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
 
   static final List<Widget> _pages = <Widget>[
-    HomeScreen(),
-    FeaturesScreen(),
-    PricingScreen(),
-    TestimonialScreen(),
+    const HomeScreen(),
+    const FeaturesScreen(),
+    const PricingScreen(),
+    const TestimonialScreen(),
   ];
 
   void _onItemTapped(int index) {

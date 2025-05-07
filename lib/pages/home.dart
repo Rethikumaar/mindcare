@@ -4,6 +4,8 @@ import '../widgets/nav_bar.dart';
 import 'patient_profile_page.dart';
 
 class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
+
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }

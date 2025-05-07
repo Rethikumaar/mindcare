@@ -9,12 +9,12 @@ class FeaturesScreen extends StatefulWidget {
   final Function()? onLogout;
 
   const FeaturesScreen({
-    Key? key,
+    super.key,
     this.userName,
     this.userId,
     this.onLoginSuccess,
     this.onLogout,
-  }) : super(key: key);
+  });
 
   @override
   _FeaturesScreenState createState() => _FeaturesScreenState();
@@ -44,7 +44,7 @@ class _FeaturesScreenState extends State<FeaturesScreen> {
         widget.onLogout!();
       }
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Successfully logged out')),
+        const SnackBar(content: Text('Successfully logged out')),
       );
     }).catchError((error) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -67,7 +67,7 @@ class _FeaturesScreenState extends State<FeaturesScreen> {
       ),
       items: [
         PopupMenuItem(
-          child: Row(
+          child: const Row(
             children: [
               Icon(Icons.person, color: Colors.blue),
               SizedBox(width: 8),
@@ -89,14 +89,14 @@ class _FeaturesScreenState extends State<FeaturesScreen> {
           },
         ),
         PopupMenuItem(
-          child: Row(
+          onTap: _logout,
+          child: const Row(
             children: [
               Icon(Icons.logout, color: Colors.red),
               SizedBox(width: 8),
               Text('Logout'),
             ],
           ),
-          onTap: _logout,
         ),
       ],
     );
@@ -108,7 +108,7 @@ class _FeaturesScreenState extends State<FeaturesScreen> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 2,
-        title: Text(
+        title: const Text(
           "Features",
           style: TextStyle(
             color: Colors.black,
@@ -121,7 +121,7 @@ class _FeaturesScreenState extends State<FeaturesScreen> {
               onPressed: () {
                 Navigator.pushNamed(context, '/login');
               },
-              child: Text(
+              child: const Text(
                 'Login',
                 style: TextStyle(
                   color: Colors.blue,
@@ -140,7 +140,7 @@ class _FeaturesScreenState extends State<FeaturesScreen> {
                   radius: 18,
                   child: Text(
                     widget.userName![0].toUpperCase(),
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
                     ),
@@ -151,19 +151,19 @@ class _FeaturesScreenState extends State<FeaturesScreen> {
         ],
       ),
       body: ListView.builder(
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
         itemCount: features.length,
         itemBuilder: (context, index) {
           final item = features[index];
           return Card(
-            margin: EdgeInsets.only(bottom: 16),
+            margin: const EdgeInsets.only(bottom: 16),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             elevation: 3,
             child: ListTile(
-              contentPadding: EdgeInsets.all(16),
+              contentPadding: const EdgeInsets.all(16),
               title: Text(
                 item['title']!,
-                style: TextStyle(
+                style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 18,
                 ),
@@ -172,7 +172,7 @@ class _FeaturesScreenState extends State<FeaturesScreen> {
                 padding: const EdgeInsets.only(top: 8.0),
                 child: Text(
                   item['desc']!,
-                  style: TextStyle(fontSize: 16),
+                  style: const TextStyle(fontSize: 16),
                 ),
               ),
             ),

@@ -2,6 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
+
   @override
   State<LoginPage> createState() => _LoginPageState();
 }
@@ -28,40 +30,40 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 32, vertical: 60),
+        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 60),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Log in', style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold)),
-            Text('Before we start, please log into your account'),
-            SizedBox(height: 30),
+            const Text('Log in', style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold)),
+            const Text('Before we start, please log into your account'),
+            const SizedBox(height: 30),
             TextField(
               controller: emailController,
-              decoration: InputDecoration(labelText: 'Email', hintText: 'Enter your email...'),
+              decoration: const InputDecoration(labelText: 'Email', hintText: 'Enter your email...'),
             ),
             TextField(
               controller: passwordController,
               obscureText: true,
-              decoration: InputDecoration(labelText: 'Password', hintText: 'Enter your password...'),
+              decoration: const InputDecoration(labelText: 'Password', hintText: 'Enter your password...'),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.purpleAccent,
-                padding: EdgeInsets.symmetric(vertical: 16),
+                padding: const EdgeInsets.symmetric(vertical: 16),
                 elevation: 6,
               ),
               onPressed:_login,
-              child: Center(
+              child: const Center(
                 child: Text('Log in', style: TextStyle(fontWeight: FontWeight.bold)),
               ),
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             TextButton(
               onPressed: () {
                 Navigator.pushNamed(context, '/register');
               },
-              child: Text.rich(
+              child: const Text.rich(
                 TextSpan(
                   text: "Don't have an account? ",
                   children: [

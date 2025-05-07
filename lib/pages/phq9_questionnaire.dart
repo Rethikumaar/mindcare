@@ -1,14 +1,14 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:uuid/uuid.dart';
 import 'phq9_result_page.dart';
 
 class PHQ9Questionnaire extends StatefulWidget {
+  const PHQ9Questionnaire({super.key});
+
   @override
   _PHQ9QuestionnaireState createState() => _PHQ9QuestionnaireState();
 }
@@ -35,9 +35,9 @@ class _PHQ9QuestionnaireState extends State<PHQ9Questionnaire> {
   ];
 
   int _currentIndex = 0;
-  List<int?> _responses = List.filled(9, null);
+  final List<int?> _responses = List.filled(9, null);
   bool _isLoading = false;
-  String? _userId = "rethi"; // Hardcoded for now; should be updated with Firebase logic.
+  String? _userId = "rethi";
 
   @override
   void initState() {
@@ -54,7 +54,6 @@ class _PHQ9QuestionnaireState extends State<PHQ9Questionnaire> {
         setState(() {
           _userId = username;
         });
-        print(_userId);
       } catch (e) {
         print('Error retrieving user data: $e');
       }
@@ -104,7 +103,7 @@ class _PHQ9QuestionnaireState extends State<PHQ9Questionnaire> {
     final resultUrl = Uri.parse('https://akash297-mindcare.hf.space/api/phq9_results/');
 
     try {
-      final submitRes = await http.post(
+      await http.post(
         submitUrl,
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
@@ -113,59 +112,21 @@ class _PHQ9QuestionnaireState extends State<PHQ9Questionnaire> {
         }),
       );
 
-      // if (submitRes.statusCode != 200) {
-      //   throw Exception('Submission failed: ${submitRes.body}');
-      // }
+      final resultRes = await http.get(Uri.parse('${resultUrl.toString()}?user_id=$_userId'));
+      final resultList = jsonDecode(resultRes.body);
+      final result = resultList[0];
 
-      final resultRes = await http.get(
-        Uri.parse('${resultUrl.toString()}?user_id=$_userId'),
-      );
-
-      // Print the raw response for debugging
-      print('Result Response Body: ${resultRes.body}');
-
-      if (resultRes.statusCode != 200) {
-        throw Exception("Could not fetch results.");
+      int score = 0;
+      String? scoreString = result['responses']?.toString();
+      if (scoreString != null) {
+        score = int.tryParse(scoreString) ?? 0;
       }
 
-      final resultList = jsonDecode(resultRes.body); // List of results
-      print('Decoded Result List: $resultList');
+      String assessment = result['prediction'] ?? 'Unknown';
 
-      // Access the first item in the result list (assuming you're interested in the first entry)
-      if (resultList.isEmpty) {
-        throw Exception("No results found.");
-      }
-
-      final result = resultList[0]; // Take the first item in the list
-
-      // Debug the first result object
-      print('First Result: $result');
-
-      try {
-        int score = 0;
-        String? scoreString = result['responses']?.toString();  // You might want to use the 'responses' array or change this as per your API response
-        if (scoreString != null) {
-          score = int.tryParse(scoreString) ?? 0;
-        }
-
-        String assessment = result['prediction'] ?? 'Unknown'; // Based on the response, 'prediction' seems to be the assessment
-        int testCount = 1; // You can update this if there is a 'test_count' field available in the response
-
-        print('Parsed Score: $score');
-        print('Assessment: $assessment');
-        print('Test Count: $testCount');
-
-        await _saveHistory(score, assessment);
-
-        _navigateToResultPage(score, assessment, testCount);
-      } catch (e) {
-        print('Error while parsing result data: $e');
-        _showSnackBar('Error parsing the result data.');
-      }
-    } catch (e, stackTrace) {
-      // Log the error and stack trace for more insight into where the failure is happening
-      print('Error: ${e.toString()}');
-      print('Stack Trace: $stackTrace');
+      await _saveHistory(score, assessment);
+      _navigateToResultPage(score, assessment, _responses.cast<int>());
+    } catch (e) {
       _showSnackBar('Error: ${e.toString()}');
     } finally {
       setState(() {
@@ -173,7 +134,6 @@ class _PHQ9QuestionnaireState extends State<PHQ9Questionnaire> {
       });
     }
   }
-
 
   Future<void> _saveHistory(int score, String assessment) async {
     final prefs = await SharedPreferences.getInstance();
@@ -189,18 +149,20 @@ class _PHQ9QuestionnaireState extends State<PHQ9Questionnaire> {
     await prefs.setStringList('phq9_history', historyList);
   }
 
-  void _navigateToResultPage(int score, String assessment, int testCount) {
+  void _navigateToResultPage(int score, String assessment, List<int> responses) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => PHQ9ResultPage(
+        builder: (context) => Phq9ResultPage(
           totalScore: score,
           assessment: assessment,
-          testCount: testCount,
+          responses: responses,
+          testCount: 1, // Replace this with the actual test count if available
         ),
       ),
     );
   }
+
 
   void _showSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
@@ -213,13 +175,10 @@ class _PHQ9QuestionnaireState extends State<PHQ9Questionnaire> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Question ${_currentIndex + 1} of ${_questions.length}',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-        ),
-        SizedBox(height: 16),
-        Text(question, style: TextStyle(fontSize: 20)),
-        SizedBox(height: 24),
+        Text('Question ${_currentIndex + 1} of ${_questions.length}', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+        const SizedBox(height: 16),
+        Text(question, style: const TextStyle(fontSize: 20)),
+        const SizedBox(height: 24),
         ..._answerOptions.map((option) {
           return RadioListTile<int>(
             value: option['value'],
@@ -241,7 +200,7 @@ class _PHQ9QuestionnaireState extends State<PHQ9Questionnaire> {
         if (_currentIndex > 0)
           ElevatedButton(
             onPressed: _previous,
-            child: Text('Previous'),
+            child: const Text('Previous'),
           ),
         ElevatedButton(
           onPressed: selected != null && !_isLoading ? _next : null,
@@ -254,7 +213,7 @@ class _PHQ9QuestionnaireState extends State<PHQ9Questionnaire> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('PHQ-9 Questionnaire')),
+      appBar: AppBar(title: const Text('PHQ-9 Questionnaire')),
       body: Stack(
         children: [
           Padding(
@@ -262,7 +221,7 @@ class _PHQ9QuestionnaireState extends State<PHQ9Questionnaire> {
             child: Column(
               children: [
                 _buildQuestionSection(),
-                Spacer(),
+                const Spacer(),
                 _buildNavigationButtons(),
               ],
             ),
@@ -270,7 +229,7 @@ class _PHQ9QuestionnaireState extends State<PHQ9Questionnaire> {
           if (_isLoading)
             Container(
               color: Colors.black45,
-              child: Center(child: CircularProgressIndicator()),
+              child: const Center(child: CircularProgressIndicator()),
             ),
         ],
       ),

@@ -6,7 +6,7 @@ class NavBar extends StatelessWidget {
   final Function()? onLogout;
   final Function(String)? onLoginSuccess;
 
-  NavBar({
+  const NavBar({super.key, 
     required this.isLoggedIn,
     this.userInitial,
     this.onLogout,
@@ -18,7 +18,7 @@ class NavBar extends StatelessWidget {
     return AppBar(
       backgroundColor: Colors.white,
       elevation: 0,
-      title: Row(
+      title: const Row(
         children: [
           Icon(Icons.health_and_safety, color: Colors.blue),
           SizedBox(width: 8),
@@ -34,13 +34,13 @@ class NavBar extends StatelessWidget {
                 onLoginSuccess!(name as String);
               }
             },
-            child: Text('Login', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+            child: const Text('Login', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
           )
         else
           PopupMenuButton<String>(
             icon: CircleAvatar(
               backgroundColor: Colors.purple,
-              child: Text(userInitial ?? "", style: TextStyle(color: Colors.white)),
+              child: Text(userInitial ?? "", style: const TextStyle(color: Colors.white)),
             ),
             onSelected: (value) {
               if (value == 'logout' && onLogout != null) {
@@ -49,12 +49,12 @@ class NavBar extends StatelessWidget {
             },
             itemBuilder: (BuildContext context) {
               return [
-                PopupMenuItem(value: 'profile', child: Text('Profile')),
-                PopupMenuItem(value: 'logout', child: Text('Logout', style: TextStyle(color: Colors.red))),
+                const PopupMenuItem(value: 'profile', child: Text('Profile')),
+                const PopupMenuItem(value: 'logout', child: Text('Logout', style: TextStyle(color: Colors.red))),
               ];
             },
           ),
-        SizedBox(width: 16),
+        const SizedBox(width: 16),
       ],
     );
   }

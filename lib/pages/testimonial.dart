@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class TestimonialScreen extends StatelessWidget {
-  final List<Map<String, String>> testimonials = [
+  final List<Map<String, String>> testimonials = const [
     {
       "quote": "This platform has transformed how we deliver mental health care to our patients.",
       "name": "Dr. Sarah Johnson",
@@ -29,15 +29,17 @@ class TestimonialScreen extends StatelessWidget {
     }
   ];
 
+  const TestimonialScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Testimonials"),
+        title: const Text("Testimonials"),
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -46,7 +48,7 @@ class TestimonialScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text(
+            const Text(
               "What Professionals Say",
               textAlign: TextAlign.center,
               style: TextStyle(
@@ -55,7 +57,7 @@ class TestimonialScreen extends StatelessWidget {
                 color: Colors.black,
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Column(
               children: testimonials.map((testimonial) {
                 return Padding(
@@ -80,7 +82,12 @@ class TestimonialCard extends StatelessWidget {
   final String name;
   final String title;
 
-  TestimonialCard({required this.quote, required this.name, required this.title});
+  const TestimonialCard({
+    super.key,
+    required this.quote,
+    required this.name,
+    required this.title,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -94,16 +101,16 @@ class TestimonialCard extends StatelessWidget {
           children: [
             Text(
               '"$quote"',
-              style: TextStyle(
+              style: const TextStyle(
                 fontStyle: FontStyle.italic,
                 fontSize: 16,
                 color: Colors.black87,
               ),
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             Text(
               name,
-              style: TextStyle(
+              style: const TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 14,
                 color: Colors.black,
@@ -111,7 +118,7 @@ class TestimonialCard extends StatelessWidget {
             ),
             Text(
               title,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 12,
                 color: Colors.black54,
               ),

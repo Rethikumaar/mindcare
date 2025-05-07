@@ -9,12 +9,12 @@ class PricingScreen extends StatefulWidget {
   final Function()? onLogout;
 
   const PricingScreen({
-    Key? key,
+    super.key,
     this.userName,
     this.userId,
     this.onLoginSuccess,
     this.onLogout,
-  }) : super(key: key);
+  });
 
   @override
   _PricingScreenState createState() => _PricingScreenState();
@@ -64,7 +64,7 @@ class _PricingScreenState extends State<PricingScreen> {
         widget.onLogout!();
       }
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Successfully logged out')),
+        const SnackBar(content: Text('Successfully logged out')),
       );
     }).catchError((error) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -87,7 +87,7 @@ class _PricingScreenState extends State<PricingScreen> {
       ),
       items: [
         PopupMenuItem(
-          child: Row(
+          child: const Row(
             children: [
               Icon(Icons.person, color: Colors.blue),
               SizedBox(width: 8),
@@ -109,14 +109,14 @@ class _PricingScreenState extends State<PricingScreen> {
           },
         ),
         PopupMenuItem(
-          child: Row(
+          onTap: _logout,
+          child: const Row(
             children: [
               Icon(Icons.logout, color: Colors.red),
               SizedBox(width: 8),
               Text('Logout'),
             ],
           ),
-          onTap: _logout,
         ),
       ],
     );
@@ -128,7 +128,7 @@ class _PricingScreenState extends State<PricingScreen> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 2,
-        title: Text(
+        title: const Text(
           "Pricing",
           style: TextStyle(
             color: Colors.black,
@@ -141,7 +141,7 @@ class _PricingScreenState extends State<PricingScreen> {
               onPressed: () {
                 Navigator.pushNamed(context, '/login');
               },
-              child: Text(
+              child: const Text(
                 'Login',
                 style: TextStyle(
                   color: Colors.blue,
@@ -160,7 +160,7 @@ class _PricingScreenState extends State<PricingScreen> {
                   radius: 18,
                   child: Text(
                     widget.userName![0].toUpperCase(),
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
                     ),
@@ -171,12 +171,12 @@ class _PricingScreenState extends State<PricingScreen> {
         ],
       ),
       body: ListView.builder(
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
         itemCount: plans.length,
         itemBuilder: (context, index) {
           final plan = plans[index];
           return Card(
-            margin: EdgeInsets.only(bottom: 24),
+            margin: const EdgeInsets.only(bottom: 24),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             elevation: 3,
             child: Padding(
@@ -186,16 +186,16 @@ class _PricingScreenState extends State<PricingScreen> {
                 children: [
                   Text(
                       plan['title']!,
-                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)
+                      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)
                   ),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   Text(
                       plan['price']!,
-                      style: TextStyle(color: Colors.blue, fontSize: 18, fontWeight: FontWeight.w500)
+                      style: const TextStyle(color: Colors.blue, fontSize: 18, fontWeight: FontWeight.w500)
                   ),
-                  SizedBox(height: 8),
-                  Text(plan['desc']!, style: TextStyle(fontSize: 16)),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 8),
+                  Text(plan['desc']!, style: const TextStyle(fontSize: 16)),
+                  const SizedBox(height: 16),
                   ...List.generate(
                     plan['features'].length,
                         (i) => Padding(
@@ -203,26 +203,26 @@ class _PricingScreenState extends State<PricingScreen> {
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Icon(Icons.check_circle, color: Colors.green, size: 20),
-                          SizedBox(width: 8),
+                          const Icon(Icons.check_circle, color: Colors.green, size: 20),
+                          const SizedBox(width: 8),
                           Expanded(
-                            child: Text(plan['features'][i], style: TextStyle(fontSize: 15)),
+                            child: Text(plan['features'][i], style: const TextStyle(fontSize: 15)),
                           ),
                         ],
                       ),
                     ),
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   Center(
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blue,
-                        padding: EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
                       ),
                       onPressed: () {
                         // Handle subscription
                       },
-                      child: Text('Select Plan', style: TextStyle(fontSize: 16)),
+                      child: const Text('Select Plan', style: TextStyle(fontSize: 16)),
                     ),
                   ),
                 ],

@@ -27,12 +27,12 @@ class MyApp extends StatelessWidget {
         fontFamily: 'Poppins',
         scaffoldBackgroundColor: const Color(0xFFF4F7FE),
       ),
-      home: MainScreen(), // Set the main screen
+      home: const MainScreen(), // Set the main screen
       routes: {
-        '/home': (context) => HomeScreen(),
-        '/login': (context) => LoginPage(),
-        '/register': (context) => RegisterPage(),
-        '/assessment': (context) => PHQ9Questionnaire(),
+        '/home': (context) => const HomeScreen(),
+        '/login': (context) => const LoginPage(),
+        '/register': (context) => const RegisterPage(),
+        '/assessment': (context) => const PHQ9Questionnaire(),
       },
     );
   }
