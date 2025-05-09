@@ -15,6 +15,7 @@ class PHQ9Questionnaire extends StatefulWidget {
 
 class _PHQ9QuestionnaireState extends State<PHQ9Questionnaire> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+
   final List<String> _questions = [
     'Little interest or pleasure in doing things?',
     'Feeling down, depressed, or hopeless?',
@@ -99,10 +100,13 @@ class _PHQ9QuestionnaireState extends State<PHQ9Questionnaire> {
       _isLoading = true;
     });
 
-    final submitUrl = Uri.parse('https://akash297-mindcare.hf.space/api/submit_phq9/');
-    final resultUrl = Uri.parse('https://akash297-mindcare.hf.space/api/phq9_results/');
+    // Calculate score locally
+    int score = _responses.fold(0, (sum, item) => sum + (item ?? 0));
+    String assessment = _getAssessment(score);
 
     try {
+      // Optionally still submit to API (for backend storage)
+      final submitUrl = Uri.parse('https://akash297-mindcare.hf.space/api/submit_phq9/');
       await http.post(
         submitUrl,
         headers: {'Content-Type': 'application/json'},
@@ -111,18 +115,6 @@ class _PHQ9QuestionnaireState extends State<PHQ9Questionnaire> {
           'responses': _responses,
         }),
       );
-
-      final resultRes = await http.get(Uri.parse('${resultUrl.toString()}?user_id=$_userId'));
-      final resultList = jsonDecode(resultRes.body);
-      final result = resultList[0];
-
-      int score = 0;
-      String? scoreString = result['responses']?.toString();
-      if (scoreString != null) {
-        score = int.tryParse(scoreString) ?? 0;
-      }
-
-      String assessment = result['prediction'] ?? 'Unknown';
 
       await _saveHistory(score, assessment);
       _navigateToResultPage(score, assessment, _responses.cast<int>());
@@ -133,6 +125,14 @@ class _PHQ9QuestionnaireState extends State<PHQ9Questionnaire> {
         _isLoading = false;
       });
     }
+  }
+
+  String _getAssessment(int score) {
+    if (score <= 4) return "Minimal Depression";
+    if (score <= 9) return "Mild Depression";
+    if (score <= 14) return "Moderate Depression";
+    if (score <= 19) return "Moderately Severe Depression";
+    return "Severe Depression";
   }
 
   Future<void> _saveHistory(int score, String assessment) async {
@@ -157,12 +157,11 @@ class _PHQ9QuestionnaireState extends State<PHQ9Questionnaire> {
           totalScore: score,
           assessment: assessment,
           responses: responses,
-          testCount: 1, // Replace this with the actual test count if available
+          testCount: 1,
         ),
       ),
     );
   }
-
 
   void _showSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));

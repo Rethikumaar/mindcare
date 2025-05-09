@@ -10,12 +10,12 @@ class Phq9ResultPage extends StatelessWidget {
   final int testCount;
 
   const Phq9ResultPage({
-    Key? key,
+    super.key,
     required this.totalScore,
     required this.assessment,
     required this.responses,
     required this.testCount,
-  }) : super(key: key);
+  });
 
   List<BarChartGroupData> _generateBarGroups() {
     return List.generate(responses.length, (index) {
@@ -23,7 +23,7 @@ class Phq9ResultPage extends StatelessWidget {
         x: index,
         barRods: [
           BarChartRodData(
-            toY: responses[index].toDouble(), // ✅ Corrected from `y` to `toY`
+            toY: responses[index].toDouble(),
             width: 18,
             gradient: const LinearGradient(colors: [Colors.teal]),
           ),
@@ -94,7 +94,7 @@ class Phq9ResultPage extends StatelessWidget {
       pw.Page(
         build: (context) => pw.Column(
           children: [
-            pw.Text('PHQ-9 Result Summary', style: pw.TextStyle(fontSize: 24)),
+            pw.Text('PHQ-9 Result Summary', style: const pw.TextStyle(fontSize: 24)),
             pw.SizedBox(height: 16),
             pw.Text('Responses: ${responses.join(', ')}'),
           ],
