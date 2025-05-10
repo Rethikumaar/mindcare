@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:mindcare/pages/phq9_result_page.dart';
 import 'firebase_options.dart';
 import 'pages/home.dart';
 import 'pages/login.dart';
@@ -32,7 +33,7 @@ class MyApp extends StatelessWidget {
         '/home': (context) => const HomeScreen(),
         '/login': (context) => const LoginPage(),
         '/register': (context) => const RegisterPage(),
-        '/assessment': (context) => const PHQ9Questionnaire(),
+        '/assessment': (context) =>  PHQ9Questionnaire(),
       },
     );
   }

@@ -1,0 +1,2 @@
+E:/projects/mindcare/android/app/.cxx/RelWithDebInfo/4t45j254/x86/CMakeFiles/edit_cache.dir
+E:/projects/mindcare/android/app/.cxx/RelWithDebInfo/4t45j254/x86/CMakeFiles/rebuild_cache.dir
