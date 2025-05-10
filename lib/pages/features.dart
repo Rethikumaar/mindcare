@@ -81,7 +81,7 @@ class _FeaturesScreenState extends State<FeaturesScreen> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => PatientDashboard(userId: widget.userId!),
+                    builder: (context) => PatientProfilePage(userId: widget.userId!),
                   ),
                 );
               }
@@ -115,41 +115,7 @@ class _FeaturesScreenState extends State<FeaturesScreen> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        actions: [
-          if (widget.userName == null)
-            TextButton(
-              onPressed: () {
-                Navigator.pushNamed(context, '/login');
-              },
-              child: const Text(
-                'Login',
-                style: TextStyle(
-                  color: Colors.blue,
-                  fontWeight: FontWeight.bold,
-                ),
               ),
-            )
-          else
-            InkWell(
-              key: _profileButtonKey,
-              onTap: _showProfileDropdown,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: CircleAvatar(
-                  backgroundColor: Colors.blue,
-                  radius: 18,
-                  child: Text(
-                    widget.userName![0].toUpperCase(),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-        ],
-      ),
       body: ListView.builder(
         padding: const EdgeInsets.all(16),
         itemCount: features.length,

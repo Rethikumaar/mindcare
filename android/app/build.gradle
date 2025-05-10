@@ -7,9 +7,8 @@ plugins {
 
 android {
     namespace = "com.example.mindcare"
-    compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
-    ndkVersion "25.1.8937393"
+    compileSdk =34
+    ndkVersion = "25.1.8937393"  // Use a valid NDK version
 
     defaultConfig {
         applicationId = "com.example.mindcare"

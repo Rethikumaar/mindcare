@@ -83,7 +83,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) =>PatientDashboard(
+                            builder: (context) =>PatientProfilePage(
                               userId: firebaseUser!.uid,
                             ),
                           ),
